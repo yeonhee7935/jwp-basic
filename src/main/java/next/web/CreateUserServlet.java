@@ -22,14 +22,33 @@ public class CreateUserServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(CreateUserServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/user/form.jsp");
+        RequestDispatcher rd = req.getRequestDispatcher("/user/form.jsp");
+        rd.forward(req, resp);
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        User user = new User(req.getParameter("userId"), req.getParameter("password"), req.getParameter("name"),
-                req.getParameter("email"));
-        log.debug("user : {}", user);
+        // 사용자 입력 추출
+        String userId = req.getParameter("userId");
+        String password = req.getParameter("password");
+        String name = req.getParameter("name");
+        String email = req.getParameter("email");
+
+        User user = new User(
+                userId, password, name, email
+        );
+        // 이미 가입된 유저 아이디인지 확인
+        if(DataBase.findUserById(userId)!=null){
+            req.setAttribute("message", "이미 존재하는 아이디입니다.");
+            req.setAttribute("user", user);
+            RequestDispatcher rd = req.getRequestDispatcher("/user/form.jsp");
+            rd.forward(req, resp);
+            return;
+        }
+
+        // 회원가입
         DataBase.addUser(user);
-        resp.sendRedirect("/user/list");
+        req.setAttribute("message", "회원가입 성공");
+        RequestDispatcher rd = req.getRequestDispatcher("/user/login.jsp");
+        rd.forward(req, resp);
     }
 }

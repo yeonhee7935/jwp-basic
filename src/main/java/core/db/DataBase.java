@@ -22,7 +22,6 @@ public class DataBase {
         return users.values();
     }
     public static void updateUser(User user){
-        User target = findUserById(user.getUserId());
-        users.replace(target.getUserId(), target);
+        users.replace(user.getUserId(), user);
     }
 }

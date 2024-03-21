@@ -76,6 +76,9 @@
 <div class="container" id="main">
    <div class="col-md-6 col-md-offset-3">
       <div class="panel panel-default content-main">
+          <c:if test="${not empty message}">
+            <div class="alert alert-danger" role="alert">"${message}"</div>
+          </c:if>
           <form name="question" method="post" action="/user/login">
               <div class="form-group">
                   <label for="userId">사용자 아이디</label>

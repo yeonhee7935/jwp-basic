@@ -57,7 +57,6 @@
                 <li><a href="#"><i class="glyphicon glyphicon-cog" style="color:#dd1111;"></i> Settings</a></li>
             </ul>
         </div>
-        <c:out value="${sessionStorage.user}"/>
         <div class="collapse navbar-collapse" id="navbar-collapse2">
             <ul class="nav navbar-nav navbar-right">
                 <c:choose>
@@ -78,6 +77,9 @@
 <div class="container" id="main">
     <div class="col-md-10 col-md-offset-1">
         <div class="panel panel-default">
+            <c:if test="${not empty message}">
+                <div class="alert alert-danger" role="alert">"${message}"</div>
+            </c:if>
             <table class="table table-hover">
                 <thead>
                 <tr>

@@ -18,8 +18,8 @@ import java.util.Objects;
 @WebServlet("/user/login")
 public class LoginUserServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.sendRedirect("/user/login.jsp");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        forward(req,resp,"/user/login.jsp");
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,12 +28,12 @@ public class LoginUserServlet extends HttpServlet {
 
         User user = DataBase.findUserById(userId);
         if(user==null || !Objects.equals(user.getPassword(), password)){
-            forward(req,resp,"/user/login_failed.jsp");
+            req.setAttribute("message", "존재하지 않는 아이디이거나 비밀번호가 일치하지 않습니다.");
+            forward(req,resp,"/user/login.jsp");
             return;
         }
         HttpSession session = req.getSession();
         session.setAttribute("user", user);
-        log.debug("Login Success: {}",user);
         resp.sendRedirect("/");
     }
 
