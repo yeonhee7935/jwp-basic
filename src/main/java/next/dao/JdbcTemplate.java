@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public abstract class JdbcTemplate {
 
-    public Object executeQuery(String sql, PreparedStatementSetter pss, RowMapper rm) {
+    public <T> T executeQuery(String sql, PreparedStatementSetter pss, RowMapper<T> rm) {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             pss.setValues(pstmt);
             pstmt.executeQuery();

@@ -43,17 +43,14 @@ public class UserDao {
     }
 
     public User findByUserId(String userId) {
-        RowMapper rm = new RowMapper() {
-            @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                User user = null;
-                while (rs.next()) {
-                    user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                            rs.getString("email"));
-                }
-
-                return user;
+        RowMapper<User> rm = rs -> {
+            User user = null;
+            while (rs.next()) {
+                user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+                        rs.getString("email"));
             }
+
+            return user;
         };
         PreparedStatementSetter pss = new PreparedStatementSetter() {
             @Override
@@ -61,34 +58,29 @@ public class UserDao {
                 pstmt.setString(1, userId);
             }
         };
-        Object user = new JdbcTemplate() {
+        return new JdbcTemplate() {
         }.executeQuery("SELECT userId, password, name, email FROM USERS WHERE userid=?", pss, rm);
-        return (User) user;
     }
 
     public List<User> findAll() {
 
-        RowMapper rm = new RowMapper() {
-            @Override
-            public Object mapRow(ResultSet rs) throws SQLException {
-                List<User> users = new ArrayList<>();
-                if (rs.next()) {
-                    User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                            rs.getString("email"));
-                    users.add(user);
-                }
-
-                return users;
+        RowMapper<List<User>> rm = rs -> {
+            List<User> users = new ArrayList<>();
+            if (rs.next()) {
+                User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+                        rs.getString("email"));
+                users.add(user);
             }
+
+            return users;
         };
         PreparedStatementSetter pss = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
             }
         };
-        Object users = new JdbcTemplate() {
+        return new JdbcTemplate() {
         }.executeQuery("SELECT userId, password, name, email FROM USERS", pss, rm);
-        return (List<User>) users;
     }
 
 
