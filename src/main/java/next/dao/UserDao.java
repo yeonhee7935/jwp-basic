@@ -1,13 +1,11 @@
 package next.dao;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import core.jdbc.ConnectionManager;
 import next.model.User;
 
 public class UserDao {
@@ -15,6 +13,7 @@ public class UserDao {
 
     public void insert(User user) throws SQLException {
         new JdbcTemplate() {
+
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
@@ -23,13 +22,19 @@ public class UserDao {
                 pstmt.setString(4, user.getEmail());
             }
 
-        }.execute(user, "INSERT INTO USERS VALUES (?, ?, ?, ?)");
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
+
+        }.update("INSERT INTO USERS VALUES (?, ?, ?, ?)");
 
     }
 
 
     public void update(User user) throws SQLException {
         new JdbcTemplate() {
+
             @Override
             void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getPassword());
@@ -38,19 +43,18 @@ public class UserDao {
                 pstmt.setString(4, user.getUserId());
             }
 
-        }.execute(user, "Update USERS SET password=?, name=?, email=? WHERE userid=?");
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                return null;
+            }
+
+        }.update("Update USERS SET password=?, name=?, email=? WHERE userid=?");
     }
 
     public User findByUserId(String userId) throws SQLException {
-        Object user = new SelectJdbcTemplate() {
-
+        Object user = new JdbcTemplate() {
             @Override
-            String createQuery() {
-                return "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-            }
-
-            @Override
-            void setValuesForFindByUserId(PreparedStatement pstmt) throws SQLException {
+            void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, userId);
             }
 
@@ -64,20 +68,14 @@ public class UserDao {
 
                 return user;
             }
-        }.execute();
+        }.select("SELECT userId, password, name, email FROM USERS WHERE userid=?");
         return (User) user;
     }
 
     public List<User> findAll() throws SQLException {
-        Object users = new SelectJdbcTemplate() {
-
+        Object users = new JdbcTemplate() {
             @Override
-            String createQuery() {
-                return "SELECT userId, password, name, email FROM USERS";
-            }
-
-            @Override
-            void setValuesForFindByUserId(PreparedStatement pstmt) throws SQLException {
+            void setValues(PreparedStatement pstmt) throws SQLException {
             }
 
             @Override
@@ -91,7 +89,7 @@ public class UserDao {
 
                 return users;
             }
-        }.execute();
+        }.select("SELECT userId, password, name, email FROM USERS");
         return (List<User>) users;
     }
 
