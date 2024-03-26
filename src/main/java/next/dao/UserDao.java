@@ -64,15 +64,14 @@ public class UserDao {
 
     public List<User> findAll() {
 
-        RowMapper<List<User>> rm = rs -> {
-            List<User> users = new ArrayList<>();
-            if (rs.next()) {
-                User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+        RowMapper<User> rm = rs -> {
+            User user = null;
+            while (rs.next()) {
+                user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
                         rs.getString("email"));
-                users.add(user);
             }
 
-            return users;
+            return user;
         };
         PreparedStatementSetter pss = new PreparedStatementSetter() {
             @Override
@@ -80,7 +79,7 @@ public class UserDao {
             }
         };
         return new JdbcTemplate() {
-        }.executeQuery("SELECT userId, password, name, email FROM USERS", pss, rm);
+        }.executeQueryForObject("SELECT userId, password, name, email FROM USERS", pss, rm);
     }
 
 
