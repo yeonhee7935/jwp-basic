@@ -8,22 +8,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class JdbcTemplate {
-    abstract void setValues(PreparedStatement pstmt) throws SQLException;
 
-    abstract Object mapRow(ResultSet rs) throws SQLException;
-
-    public Object select(String sql) throws SQLException {
+    public Object executeQuery(String sql, PreparedStatementSetter pss, RowMapper rm) throws SQLException {
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
             con = ConnectionManager.getConnection();
             pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+            pss.setValues(pstmt);
 
             rs = pstmt.executeQuery();
 
-            return mapRow(rs);
+            return rm.mapRow(rs);
         } finally {
             if (rs != null) {
                 rs.close();
@@ -37,13 +34,13 @@ public abstract class JdbcTemplate {
         }
     }
 
-    public void update( String sql) throws SQLException {
+    public void executeUpdate(String sql, PreparedStatementSetter pss) throws SQLException {
         Connection con = null;
         PreparedStatement pstmt = null;
         try {
             con = ConnectionManager.getConnection();
             pstmt = con.prepareStatement(sql);
-            setValues(pstmt);
+            pss.setValues(pstmt);
             pstmt.executeUpdate();
         } finally {
             if (pstmt != null) {
