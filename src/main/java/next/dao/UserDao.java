@@ -11,119 +11,88 @@ import core.jdbc.ConnectionManager;
 import next.model.User;
 
 public class UserDao {
+
+
     public void insert(User user) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, user.getUserId());
-            pstmt.setString(2, user.getPassword());
-            pstmt.setString(3, user.getName());
-            pstmt.setString(4, user.getEmail());
-
-            pstmt.executeUpdate();
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
+        new JdbcTemplate() {
+            @Override
+            void setValues(PreparedStatement pstmt) throws SQLException {
+                pstmt.setString(1, user.getUserId());
+                pstmt.setString(2, user.getPassword());
+                pstmt.setString(3, user.getName());
+                pstmt.setString(4, user.getEmail());
             }
 
-            if (con != null) {
-                con.close();
-            }
-        }
+        }.execute(user, "INSERT INTO USERS VALUES (?, ?, ?, ?)");
+
     }
+
 
     public void update(User user) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = "Update USERS SET password=?, name=?, email=? WHERE userid=?";
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, user.getPassword());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setString(4, user.getUserId());
-
-            pstmt.executeUpdate();
-
-
-        } finally {
-            if (pstmt != null) {
-                pstmt.close();
+        new JdbcTemplate() {
+            @Override
+            void setValues(PreparedStatement pstmt) throws SQLException {
+                pstmt.setString(1, user.getPassword());
+                pstmt.setString(2, user.getName());
+                pstmt.setString(3, user.getEmail());
+                pstmt.setString(4, user.getUserId());
             }
-            if (con != null) {
-                con.close();
-            }
-        }
+
+        }.execute(user, "Update USERS SET password=?, name=?, email=? WHERE userid=?");
     }
 
-
     public User findByUserId(String userId) throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, userId);
+        Object user = new SelectJdbcTemplate() {
 
-            rs = pstmt.executeQuery();
-
-            User user = null;
-            while (rs.next()) {
-                user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                        rs.getString("email"));
+            @Override
+            String createQuery() {
+                return "SELECT userId, password, name, email FROM USERS WHERE userid=?";
             }
 
-            return user;
-        } finally {
-            if (rs != null) {
-                rs.close();
+            @Override
+            void setValuesForFindByUserId(PreparedStatement pstmt) throws SQLException {
+                pstmt.setString(1, userId);
             }
-            if (pstmt != null) {
-                pstmt.close();
+
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                User user = null;
+                while (rs.next()) {
+                    user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+                            rs.getString("email"));
+                }
+
+                return user;
             }
-            if (con != null) {
-                con.close();
-            }
-        }
+        }.execute();
+        return (User) user;
     }
 
     public List<User> findAll() throws SQLException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            con = ConnectionManager.getConnection();
-            String sql = "SELECT userId, password, name, email FROM USERS";
-            pstmt = con.prepareStatement(sql);
+        Object users = new SelectJdbcTemplate() {
 
-            rs = pstmt.executeQuery();
-
-            List<User> users = new ArrayList<>();
-            if (rs.next()) {
-                User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
-                        rs.getString("email"));
-                users.add(user);
+            @Override
+            String createQuery() {
+                return "SELECT userId, password, name, email FROM USERS";
             }
 
-            return users;
-        } finally {
-            if (rs != null) {
-                rs.close();
+            @Override
+            void setValuesForFindByUserId(PreparedStatement pstmt) throws SQLException {
             }
-            if (pstmt != null) {
-                pstmt.close();
+
+            @Override
+            Object mapRow(ResultSet rs) throws SQLException {
+                List<User> users = new ArrayList<>();
+                if (rs.next()) {
+                    User user = new User(rs.getString("userId"), rs.getString("password"), rs.getString("name"),
+                            rs.getString("email"));
+                    users.add(user);
+                }
+
+                return users;
             }
-            if (con != null) {
-                con.close();
-            }
-        }
+        }.execute();
+        return (List<User>) users;
     }
 
 
