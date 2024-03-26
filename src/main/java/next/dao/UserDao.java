@@ -11,7 +11,7 @@ import next.model.User;
 public class UserDao {
 
 
-    public void insert(User user) throws SQLException {
+    public void insert(User user) {
 
         PreparedStatementSetter pss = new PreparedStatementSetter() {
             @Override
@@ -28,7 +28,7 @@ public class UserDao {
     }
 
 
-    public void update(User user) throws SQLException {
+    public void update(User user) {
         PreparedStatementSetter pss = new PreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement pstmt) throws SQLException {
@@ -42,7 +42,7 @@ public class UserDao {
         }.executeUpdate("Update USERS SET password=?, name=?, email=? WHERE userid=?", pss);
     }
 
-    public User findByUserId(String userId) throws SQLException {
+    public User findByUserId(String userId) {
         RowMapper rm = new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs) throws SQLException {
@@ -66,7 +66,7 @@ public class UserDao {
         return (User) user;
     }
 
-    public List<User> findAll() throws SQLException {
+    public List<User> findAll() {
 
         RowMapper rm = new RowMapper() {
             @Override
