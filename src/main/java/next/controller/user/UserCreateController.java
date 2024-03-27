@@ -1,4 +1,4 @@
-package next.controller;
+package next.controller.user;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,8 +10,8 @@ import core.mvc.Controller;
 import next.dao.UserDao;
 import next.model.User;
 
-public class CreateUserController implements Controller {
-    private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
+public class UserCreateController implements Controller {
+    private static final Logger log = LoggerFactory.getLogger(UserCreateController.class);
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws Exception {
